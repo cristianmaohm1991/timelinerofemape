@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>ROF · EMAPE · timeline viva · burbujas ligeras · etiquetas originales</title>
+<style>
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif;
+    background: #f3f6fc;
+    margin: 0;
+    padding: 36px 28px;
+  }
+
+  h1 {
+    text-align: center;
+    color: #1a3e50;
+    font-weight: 600;
+    font-size: 1.85rem;
+    margin-bottom: 0.25rem;
+    letter-spacing: -0.3px;
+  }
+  .subhead {
+    text-align: center;
+    color: #6c86a0;
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #dde6ef;
+    padding-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .legend-tip {
+    background: rgba(255,255,245,0.7);
+    backdrop-filter: blur(4px);
+    border-radius: 60px;
+    padding: 0.2rem 1.2rem;
+    font-size: 0.7rem;
+    color: #2c7a4d;
+    font-weight: 500;
+    border: 1px solid #cddfee;
+  }
+
+  /* CONTENEDOR PRINCIPAL */
+  .timeline {
+    width: 100%;
+    max-width: 1800px;
+    margin: 0 auto;
+    position: relative;
+    background: rgba(255,255,250,0.65);
+    border-radius: 36px;
+    padding: 1.2rem 0 0.8rem 0;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(255,255,245,0.9);
+  }
+
+  /* AÑOS - ESCALA DE GRISES ELEGANTE */
+  .years {
+    display: grid;
+    grid-template-columns: repeat(84, 1fr);
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .year {
+    text-align: center;
+    padding: 7px 0;
+    color: white;
+    font-size: 0.82rem;
+    border-radius: 28px 28px 14px 14px;
+    font-weight: 500;
+    letter-spacing: -0.2px;
+    transition: all 0.2s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+  .y2021 { background: #6c757d; }
+  .y2022 { background: #5a626e; }
+  .y2023 { background: #7e8c8d; }
+  .y2024 { background: #8f9aa4; }
+  .y2025 { background: #9aaebf; }
+  .y2026 { background: #6c8b7a; box-shadow: 0 0 0 1px rgba(108,139,122,0.3); }
+
+  /* MESES */
+  .months {
+    display: grid;
+    grid-template-columns: repeat(84, 1fr);
+    font-size: 0.6rem;
+    color: #9bb5cf;
+    border-bottom: 1px solid #e4edf5;
+    padding-bottom: 5px;
+    margin-bottom: 18px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .month {
+    text-align: center;
+  }
+
+  /* TRACK */
+  .track {
+    display: grid;
+    grid-template-columns: repeat(84, 1fr);
+    gap: 1px;
+    margin-bottom: 12px;
+  }
+
+  /* BARRAS - COLORES VIVOS, TODOS DIFERENTES */
+  .bar-link {
+    display: block;
+    height: 36px;
+    border-radius: 26px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+    transition: all 0.2s cubic-bezier(0.2, 0.85, 0.4, 1.05);
+    cursor: pointer;
+    text-decoration: none;
+    position: relative;
+    opacity: 0.94;
+    border: 1px solid rgba(255,245,210,0.5);
+  }
+  .bar-link:hover {
+    opacity: 1;
+    transform: translateY(-2px) scaleY(1.02);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+    filter: brightness(1.02);
+    z-index: 18;
+  }
+
+  /* FILA DE FECHAS - ETIQUETAS ORIGINALES RESTAURADAS */
+  .dates-row {
+    display: grid;
+    grid-template-columns: repeat(84, 1fr);
+    margin-top: 8px;
+    align-items: start;
+  }
+  .date-cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .date-item {
+    font-size: 0.55rem;
+    font-weight: 500;
+    color: #3a6e91;
+    background: rgba(248, 250, 252, 0.8);
+    backdrop-filter: blur(2px);
+    padding: 0.2rem 0.7rem;
+    border-radius: 40px;
+    white-space: nowrap;
+    border: 1px solid #d4e2f0;
+    transition: all 0.2s;
+    cursor: default;
+  }
+  .date-item.highlight-date {
+    background: #ffe1a0 !important;
+    color: #b45f1b !important;
+    border-color: #f0b86e !important;
+    box-shadow: 0 2px 10px rgba(240,184,110,0.3);
+    transform: scale(1.02);
+    font-weight: 700;
+  }
+
+  /* ===== BURBUJAS ULTRALIGERAS, SIN PARPADEO ===== */
+  .bubble-code, .bubble-vigencia {
+    position: fixed;
+    background: rgba(255, 255, 248, 0.92);
+    backdrop-filter: blur(20px);
+    border-radius: 32px;
+    padding: 6px 18px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(210, 225, 245, 0.5);
+    font-family: 'Inter', 'Segoe UI', system-ui;
+    white-space: nowrap;
+    z-index: 10000;
+    pointer-events: none;
+    transition: opacity 0.18s ease-out;
+    letter-spacing: -0.2px;
+    border: none;
+  }
+  .bubble-code {
+    background: rgba(250, 252, 255, 0.92);
+    color: #1d6f9c;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-weight: 550;
+    font-size: 0.7rem;
+    border-left: 3px solid #ffaa44;
+  }
+  .bubble-vigencia {
+    background: rgba(255, 253, 242, 0.92);
+    color: #aa7c3c;
+    font-weight: 500;
+    font-size: 0.68rem;
+    border-left: 3px solid #d4a373;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .bubble-vigencia::before {
+    content: "📅";
+    font-size: 0.65rem;
+    opacity: 0.8;
+  }
+
+  @media (max-width: 700px) {
+    .bubble-code, .bubble-vigencia {
+      white-space: normal;
+      max-width: 240px;
+      font-size: 0.65rem;
+      padding: 5px 14px;
+    }
+  }
+
+  .footer-stats {
+    max-width: 1800px;
+    margin: 2rem auto 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #5e7e9c;
+    font-size: 0.75rem;
+    border-top: 1px solid #dfeaf2;
+    padding-top: 1rem;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .badge-count {
+    background: #eef3fa;
+    border-radius: 40px;
+    padding: 0.2rem 1rem;
+    font-weight: 500;
+  }
+  .info-hint {
+    background: rgba(255,255,245,0.7);
+    border-radius: 24px;
+    padding: 0.2rem 1rem;
+    font-size: 0.7rem;
+    backdrop-filter: blur(2px);
+  }
+</style>
+</head>
+<body>
+
+<h1> Línea de Tiempo - ROF - EMAPE S.A.</h1>
+<div class="subhead">
+  <span>🔍Extraídos del Sistema de Gestión Documental, desde su implementación a la fecha.</span> <br>
+  <span class="legend-tip">✨ interactuar con la documentación usando los botones de colores</span>
+</div>
+
+<div class="timeline">
+  <!-- AÑOS en grises elegantes -->
+  <div class="years">
+    <div style="grid-column:1/7;"></div>
+    <div class="year y2021" style="grid-column:7/19;">2021</div>
+    <div class="year y2022" style="grid-column:19/31;">2022</div>
+    <div class="year y2023" style="grid-column:31/43;">2023</div>
+    <div class="year y2024" style="grid-column:43/55;">2024</div>
+    <div class="year y2025" style="grid-column:55/67;">2025</div>
+    <div class="year y2026" style="grid-column:67/79;">2026</div>
+    <div style="grid-column:79/85;"></div>
+  </div>
+
+  <!-- MESES -->
+  <div class="months" id="monthsContainer">
+    <script>
+      for(let i=0; i<6; i++) document.write("<div class='month' style='opacity:0;'>-</div>");
+      const meses = ["E","F","M","A","M","J","J","A","S","O","N","D"];
+      for(let y=0; y<6; y++) {
+        for(let m=0; m<12; m++) {
+          document.write("<div class='month'>"+meses[m]+"</div>");
+        }
+      }
+      for(let i=0; i<6; i++) document.write("<div class='month' style='opacity:0;'>-</div>");
+    </script>
+  </div>
+
+  <!-- TRACK DE BARRAS - colores vivos, únicos -->
+  <div class="track" id="trackBars">
+    <!-- 000082-2021: coral -->
+    <a class="bar-link" style="grid-column:12/14; background:#ff7c60;" href="https://www.gob.pe/institucion/emape/normas-legales/7903384-000082-2021-emape-gg" target="_blank" data-code="RGG-000082-2021/GG" data-vigencia="Vigencia: del 10-06-2021 al 19-07-2021" data-date-idx="date0"></a>
+    <!-- 000094-2021: amarillo mango -->
+    <a class="bar-link" style="grid-column:13/16; background:#f4c542;" href="https://www.gob.pe/institucion/emape/normas-legales/7903623-000094-2021-emape-gg" target="_blank" data-code="RGG-000094-2021/GG" data-vigencia="Vigencia: del 20-07-2021 al 02-09-2021" data-date-idx="date1"></a>
+    <!-- 000129-2021: rosado intenso -->
+    <a class="bar-link" style="grid-column:15/34; background:#e86f8b;" href="https://www.gob.pe/institucion/emape/normas-legales/7903634-000129-2021-emape-gg" target="_blank" data-code="RGG-000129-2021/GG" data-vigencia="Vigencia: del 03-09-2021 al 11-04-2023" data-date-idx="date2"></a>
+    <!-- 000069-2023: morado lavanda -->
+    <a class="bar-link" style="grid-column:34/38; background:#b77bdb;" href="https://www.gob.pe/institucion/emape/normas-legales/7903690-000069-2023-emape-gg" target="_blank" data-code="RGG-000069-2023/GG" data-vigencia="Vigencia: del 12-04-2023 al 23-08-2023" data-date-idx="date3"></a>
+    <!-- 000110-2023: azul cielo eléctrico -->
+    <a class="bar-link" style="grid-column:38/47; background:#4d9de0;" href="https://www.gob.pe/institucion/emape/normas-legales/7904053-000110-2023-emape-gg" target="_blank" data-code="RGG-000110-2023/GG" data-vigencia="Vigencia: del 24-08-2023 al 16-05-2024" data-date-idx="date4"></a>
+    <!-- 000066-2024: turquesa brillante -->
+    <a class="bar-link" style="grid-column:47/58; background:#2dc9b2;" href="https://www.gob.pe/institucion/emape/normas-legales/7904333-000066-2024-emape-gg" target="_blank" data-code="RGG-000066-2024/GG" data-vigencia="Vigencia: del 17-05-2024 al 12-04-2025" data-date-idx="date5"></a>
+    <!-- 000016-2025: amarillo mostaza -->
+    <a class="bar-link" style="grid-column:58/59; background:#e3b13c;" href="https://www.gob.pe/institucion/emape/normas-legales/7904524-000016-2025-emape-gg" target="_blank" data-code="RGG-000016-2025/GG" data-vigencia="Vigencia: del 13-04-2025 al 15-04-2025" data-date-idx="date6"></a>
+    <!-- 000029-2025: naranja flama -->
+    <a class="bar-link" style="grid-column:59/63; background:#f28c42;" href="https://www.gob.pe/institucion/emape/normas-legales/7904514-000029-2025-emape-gg" target="_blank" data-code="RGG-000029-2025/GG" data-vigencia="Vigencia: del 16-04-2025 al 19-08-2025" data-date-idx="date7"></a>
+    <!-- 000078-2025: fucsia -->
+    <a class="bar-link" style="grid-column:63/70; background:#dd6dad;" href="https://www.gob.pe/institucion/emape/normas-legales/7063100-000078-2025-emape-gg" target="_blank" data-code="RGG-000078-2025/GG" data-vigencia="Vigencia: del 20-08-2025 al 05-01-2026" data-date-idx="date8"></a>
+    <!-- 000002-2026: mandarina -->
+    <a class="bar-link" style="grid-column:70/72; background:#ff8c42;" href="https://www.gob.pe/institucion/emape/normas-legales/7616638-000002-2026-emape-gg" target="_blank" data-code="RGG-000002-2026/GG" data-vigencia="Vigencia: del 06-01-2026 al 26-02-2026" data-date-idx="date9"></a>
+    <!-- 000021-2026 VIGENTE - verde exclusivo -->
+    <a class="bar-link" style="grid-column:72/79; background:#2b9c6c; box-shadow:0 0 0 2px rgba(43,156,108,0.3), 0 4px 12px rgba(43,156,108,0.3);" href="https://www.gob.pe/institucion/emape/normas-legales/7807130-000021-2026-emape-gg" target="_blank" data-code="RGG-000021-2026" data-vigencia="Vigencia: del 27-02-2026 a la actualidad · ROF vigente" data-date-idx="date10"></a>
+  </div>
+
+  <!-- FILA DE FECHAS - ETIQUETAS ORIGINALES RESTAURADAS: 2021-1, 2021-2, etc. -->
+  <div class="dates-row" id="datesRow">
+    <div style="grid-column:12/14; text-align:center;" class="date-cell"><span class="date-item" id="date0">📅 2021-1</span></div>
+    <div style="grid-column:13/16; text-align:center;" class="date-cell"><span class="date-item" id="date1">📅 2021-2</span></div>
+    <div style="grid-column:15/34; text-align:center;" class="date-cell"><span class="date-item" id="date2">📅 2021-3</span></div>
+    <div style="grid-column:34/38; text-align:center;" class="date-cell"><span class="date-item" id="date3">📅 2023-1</span></div>
+    <div style="grid-column:38/47; text-align:center;" class="date-cell"><span class="date-item" id="date4">📅 2023-2</span></div>
+    <div style="grid-column:47/58; text-align:center;" class="date-cell"><span class="date-item" id="date5">📅 2024</span></div>
+    <div style="grid-column:58/59; text-align:center;" class="date-cell"><span class="date-item" id="date6">📅 2025-1</span></div>
+    <div style="grid-column:59/63; text-align:center;" class="date-cell"><span class="date-item" id="date7">📅 2025-2</span></div>
+    <div style="grid-column:63/70; text-align:center;" class="date-cell"><span class="date-item" id="date8">📅 2025-3</span></div>
+    <div style="grid-column:70/72; text-align:center;" class="date-cell"><span class="date-item" id="date9">📅 2026-1</span></div>
+    <div style="grid-column:72/79; text-align:center;" class="date-cell"><span class="date-item" id="date10" style="background:#2b9c6c; color:white; font-weight:600; border-color:#1f7a54;">📅 2026-2 · vigente</span></div>
+  </div>
+</div>
+
+<div class="footer-stats">
+  <span class="badge-count">✅ ROF vigente: RGG-000021-2026</span>
+  <span class="info-hint">💡 Línea de tiempo interactiva elaborada por la Coordinación de Tecnologías de la Información</span>
+  
+</div>
+
+<script>
+  (function() {
+    const bars = document.querySelectorAll('.bar-link');
+    
+    const dateElements = {
+      date0: document.getElementById('date0'),
+      date1: document.getElementById('date1'),
+      date2: document.getElementById('date2'),
+      date3: document.getElementById('date3'),
+      date4: document.getElementById('date4'),
+      date5: document.getElementById('date5'),
+      date6: document.getElementById('date6'),
+      date7: document.getElementById('date7'),
+      date8: document.getElementById('date8'),
+      date9: document.getElementById('date9'),
+      date10: document.getElementById('date10')
+    };
+    
+    let codeBubble = null;
+    let vigenciaBubble = null;
+    let hideTimeout = null;
+    
+    function createBubbles() {
+      if (!codeBubble) {
+        codeBubble = document.createElement('div');
+        codeBubble.className = 'bubble-code';
+        codeBubble.style.opacity = '0';
+        codeBubble.style.display = 'none';
+        document.body.appendChild(codeBubble);
+      }
+      if (!vigenciaBubble) {
+        vigenciaBubble = document.createElement('div');
+        vigenciaBubble.className = 'bubble-vigencia';
+        vigenciaBubble.style.opacity = '0';
+        vigenciaBubble.style.display = 'none';
+        document.body.appendChild(vigenciaBubble);
+      }
+    }
+    
+    function positionBubbles(codeText, vigenciaText, mouseX, mouseY) {
+      if (!codeBubble || !vigenciaBubble) return;
+      
+      codeBubble.innerHTML = `📄 ${escapeHtml(codeText)}`;
+      vigenciaBubble.innerHTML = `${escapeHtml(vigenciaText)}`;
+      
+      codeBubble.style.display = 'block';
+      vigenciaBubble.style.display = 'block';
+      codeBubble.style.opacity = '1';
+      vigenciaBubble.style.opacity = '1';
+      
+      let codeLeft = mouseX - 100;
+      let codeTop = mouseY - 52;
+      let vigLeft = mouseX + 22;
+      let vigTop = mouseY - 22;
+      
+      codeBubble.style.left = codeLeft + 'px';
+      codeBubble.style.top = codeTop + 'px';
+      vigenciaBubble.style.left = vigLeft + 'px';
+      vigenciaBubble.style.top = vigTop + 'px';
+      
+      requestAnimationFrame(() => {
+        if (!codeBubble || !vigenciaBubble) return;
+        const codeRect = codeBubble.getBoundingClientRect();
+        const vigRect = vigenciaBubble.getBoundingClientRect();
+        const viewW = window.innerWidth;
+        const viewH = window.innerHeight;
+        
+        let finalCodeL = codeLeft;
+        let finalCodeT = codeTop;
+        let finalVigL = vigLeft;
+        let finalVigT = vigTop;
+        
+        if (codeRect.left < 8) finalCodeL = 12;
+        if (codeRect.top < 8) finalCodeT = mouseY + 18;
+        if (codeRect.right > viewW - 8) finalCodeL = mouseX - codeRect.width - 12;
+        if (vigRect.right > viewW - 8) finalVigL = mouseX - vigRect.width - 12;
+        if (vigRect.left < 8) finalVigL = mouseX + 15;
+        if (vigRect.bottom > viewH - 12) finalVigT = mouseY - vigRect.height - 8;
+        if (vigRect.top < 8) finalVigT = mouseY + 24;
+        
+        codeBubble.style.left = finalCodeL + 'px';
+        codeBubble.style.top = finalCodeT + 'px';
+        vigenciaBubble.style.left = finalVigL + 'px';
+        vigenciaBubble.style.top = finalVigT + 'px';
+        
+        const finalCodeRect = codeBubble.getBoundingClientRect();
+        const finalVigRect = vigenciaBubble.getBoundingClientRect();
+        const overlapping = !(finalCodeRect.right < finalVigRect.left ||
+                              finalCodeRect.left > finalVigRect.right ||
+                              finalCodeRect.bottom < finalVigRect.top ||
+                              finalCodeRect.top > finalVigRect.bottom);
+        if (overlapping) {
+          let newVigTop = finalVigT;
+          if (finalCodeRect.bottom + 12 + finalVigRect.height < viewH) {
+            newVigTop = finalCodeRect.bottom + 8;
+          } else {
+            newVigTop = finalCodeRect.top - finalVigRect.height - 8;
+          }
+          vigenciaBubble.style.top = newVigTop + 'px';
+        }
+      });
+    }
+    
+    function hideBubblesStable() {
+      if (hideTimeout) clearTimeout(hideTimeout);
+      hideTimeout = setTimeout(() => {
+        if (codeBubble) {
+          codeBubble.style.opacity = '0';
+          codeBubble.style.display = 'none';
+        }
+        if (vigenciaBubble) {
+          vigenciaBubble.style.opacity = '0';
+          vigenciaBubble.style.display = 'none';
+        }
+      }, 25);
+    }
+    
+    function cancelHide() {
+      if (hideTimeout) {
+        clearTimeout(hideTimeout);
+        hideTimeout = null;
+      }
+      if (codeBubble && codeBubble.style.display === 'none') {
+        codeBubble.style.display = 'block';
+        vigenciaBubble.style.display = 'block';
+        codeBubble.style.opacity = '1';
+        vigenciaBubble.style.opacity = '1';
+      }
+    }
+    
+    function clearHighlights() {
+      Object.values(dateElements).forEach(el => {
+        if (el) el.classList.remove('highlight-date');
+      });
+    }
+    
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+      });
+    }
+    
+    createBubbles();
+    
+    bars.forEach(bar => {
+      const dateIdx = bar.getAttribute('data-date-idx');
+      const rawCode = bar.getAttribute('data-code') || 'RGG-XXX';
+      let vigenciaRaw = bar.getAttribute('data-vigencia') || 'Vigencia según documento';
+      let vigenciaDisplay = vigenciaRaw;
+      if (!vigenciaRaw.toLowerCase().includes('del') && !vigenciaRaw.includes('actualidad')) {
+        vigenciaDisplay = `Vigencia: ${vigenciaRaw}`;
+      }
+      
+      bar.addEventListener('mouseenter', (e) => {
+        cancelHide();
+        clearHighlights();
+        if (dateIdx && dateElements[dateIdx]) {
+          dateElements[dateIdx].classList.add('highlight-date');
+        }
+        positionBubbles(rawCode, vigenciaDisplay, e.clientX, e.clientY);
+      });
+      
+      bar.addEventListener('mousemove', (e) => {
+        if (codeBubble && codeBubble.style.display === 'block') {
+          let codeLeft = e.clientX - 100;
+          let codeTop = e.clientY - 52;
+          let vigLeft = e.clientX + 22;
+          let vigTop = e.clientY - 22;
+          
+          codeBubble.style.left = codeLeft + 'px';
+          codeBubble.style.top = codeTop + 'px';
+          vigenciaBubble.style.left = vigLeft + 'px';
+          vigenciaBubble.style.top = vigTop + 'px';
+          
+          requestAnimationFrame(() => {
+            if (!codeBubble || !vigenciaBubble) return;
+            const cRect = codeBubble.getBoundingClientRect();
+            const vRect = vigenciaBubble.getBoundingClientRect();
+            const viewW = window.innerWidth;
+            const viewH = window.innerHeight;
+            let newCL = codeLeft, newCT = codeTop, newVL = vigLeft, newVT = vigTop;
+            if (cRect.left < 8) newCL = 12;
+            if (cRect.top < 8) newCT = e.clientY + 18;
+            if (cRect.right > viewW - 8) newCL = e.clientX - cRect.width - 12;
+            if (vRect.right > viewW - 8) newVL = e.clientX - vRect.width - 12;
+            if (vRect.left < 8) newVL = e.clientX + 15;
+            if (vRect.bottom > viewH - 12) newVT = e.clientY - vRect.height - 8;
+            if (vRect.top < 8) newVT = e.clientY + 24;
+            codeBubble.style.left = newCL + 'px';
+            codeBubble.style.top = newCT + 'px';
+            vigenciaBubble.style.left = newVL + 'px';
+            vigenciaBubble.style.top = newVT + 'px';
+            
+            const finalC = codeBubble.getBoundingClientRect();
+            const finalV = vigenciaBubble.getBoundingClientRect();
+            const overlap = !(finalC.right < finalV.left || finalC.left > finalV.right || finalC.bottom < finalV.top || finalC.top > finalV.bottom);
+            if (overlap) {
+              let newVigTop = finalV.top;
+              if (finalC.bottom + 12 + finalV.height < viewH) newVigTop = finalC.bottom + 8;
+              else newVigTop = finalC.top - finalV.height - 8;
+              vigenciaBubble.style.top = newVigTop + 'px';
+            }
+          });
+        }
+      });
+      
+      bar.addEventListener('mouseleave', () => {
+        if (dateIdx && dateElements[dateIdx]) {
+          dateElements[dateIdx].classList.remove('highlight-date');
+        }
+        hideBubblesStable();
+      });
+    });
+    
+    const timelineContainer = document.querySelector('.timeline');
+    if (timelineContainer) {
+      timelineContainer.addEventListener('mouseleave', () => {
+        clearHighlights();
+        hideBubblesStable();
+      });
+    }
+    document.body.addEventListener('mouseleave', () => {
+      hideBubblesStable();
+      clearHighlights();
+    });
+    window.addEventListener('scroll', () => hideBubblesStable());
+  })();
+</script>
+</body>
+</html>
